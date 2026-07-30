@@ -1,0 +1,135 @@
+/* Сброс */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    overflow-x: hidden;
+    touch-action: manipulation;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #1a1a2e;
+    color: #fff;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* Header */
+.header {
+    padding: 20px 0;
+    text-align: center;
+    background-color: #16213e;
+}
+
+.header__title {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: #ffd369;
+}
+
+.instruction {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.instruction__img {
+    max-width: 150px;
+    height: auto;
+}
+
+.instruction__text {
+    font-size: 1rem;
+    line-height: 1.5;
+    text-align: center;
+    color: #e0e0e0;
+}
+
+/* Игровое поле */
+.figures {
+    position: relative;
+    padding: 20px 0;
+    min-height: 500px;
+}
+
+.figures__container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    position: relative;
+    padding: 40px 20px;
+    min-height: 500px;
+}
+
+/* Canvas-маска фонарика */
+#dots {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Картинки под canvas остаются кликабельными */
+    touch-action: none;   /* Отключаем системные жесты браузера */
+    z-index: 10;
+}
+
+.figures__figure {
+    text-align: center;
+    position: relative;
+    z-index: 5;
+    transition: transform 0.3s ease;
+}
+
+.figures__img {
+    max-width: 140px;
+    height: auto;
+    display: block;
+    margin: 0 auto 10px;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+}
+
+.figures__par {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+/* Адаптив */
+@media (max-width: 600px) {
+    .header__title {
+        font-size: 1.5rem;
+    }
+
+    .instruction__text {
+        font-size: 0.9rem;
+    }
+
+    .figures__container {
+        gap: 20px;
+        padding: 20px 10px;
+    }
+
+    .figures__img {
+        max-width: 100px;
+    }
+
+    .figures__par {
+        font-size: 0.95rem;
+    }
+}

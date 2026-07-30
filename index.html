@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Фонарик</title>
+    <link rel="stylesheet" href="css/everywhereS.css">
+    <link rel="icon" href="img/favicon/favbg.svg" type="image/x-icon">
+</head>
+<body>
+
+    <header class="header">
+        <div class="container header__container">
+            <h2 class="header__title">Фонарик</h2>
+
+            <figure class="instruction">
+                <img src="img/header/beaverFlashlight.png" alt="Бобёр" class="instruction__img">
+                <figcaption class="instruction__text">
+                    Бобёр построил себе настоящую палатку для чтения.
+                    Чтобы лучше видеть картинки в книжке, он подсвечивает их фонариком.
+                    Давай сыграем с ним: проведи пальцем (или мышкой) по тёмному экрану,
+                    найди все спрятанные картинки, произнеси их названия,
+                    правильно произнося звук «С». Удачи!
+                </figcaption>
+            </figure>
+        </div>
+    </header>
+
+    <main>
+        <section class="figures torch" id="torch">
+            <!-- Контейнер для картинок — они будут добавлены сюда динамически -->
+            <div class="figures__container back area" id="figuresContainer">
+                <canvas id="dots"></canvas>
+            </div>
+        </section>
+    </main>
+
+    <!-- ВАЖНО: game.js должен подключаться ПЕРВЫМ, чтобы создать DOM до инициализации canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/everywhereS.js"></script>
+    <script src="js/flashlight.js"></script>
+</body>
+</html>

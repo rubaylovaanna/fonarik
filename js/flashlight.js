@@ -3,17 +3,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!dots) return;
 
     const ctx = dots.getContext('2d');
-    const torchArea = document.getElementById('torch');
 
     let canvasWidth = 0;
     let canvasHeight = 0;
     let mx = 0;
     let my = 0;
-    const LIGHT_RADIUS = 130; // радиус луча фонарика
+    
+    // Радиус фонарика (уменьшен на 50%)
+    const LIGHT_RADIUS = 65;
 
     function setupCanvas() {
-        // Используем размеры контейнера, а не окна — чтобы маска работала только над игровым полем
-        const rect = torchArea.getBoundingClientRect();
+        const container = document.getElementById('figuresContainer');
+        const rect = container.getBoundingClientRect();
         const dpr = window.devicePixelRatio || 1;
 
         canvasWidth = rect.width;
@@ -24,21 +25,18 @@ document.addEventListener('DOMContentLoaded', () => {
         dots.style.width = canvasWidth + 'px';
         dots.style.height = canvasHeight + 'px';
 
-        ctx.setTransform(1, 0, 0, 1, 0, 0); // сброс
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.scale(dpr, dpr);
 
-        // Центрируем курсор, чтобы при загрузке фонарик был в центре
         mx = canvasWidth / 2;
         my = canvasHeight / 2;
     }
 
     function render() {
-        // 1. Полностью затемняем область
         ctx.globalCompositeOperation = 'source-over';
         ctx.fillStyle = 'rgba(10, 10, 25, 0.97)';
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-        // 2. "Вырезаем" круг света в позиции курсора
         ctx.globalCompositeOperation = 'destination-out';
 
         const gradient = ctx.createRadialGradient(mx, my, 0, mx, my, LIGHT_RADIUS);
@@ -51,46 +49,45 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.arc(mx, my, LIGHT_RADIUS, 0, Math.PI * 2);
         ctx.fill();
 
-        // 3. Возвращаем обычный режим рисования
         ctx.globalCompositeOperation = 'source-over';
 
         requestAnimationFrame(render);
     }
 
-    // Преобразуем координаты курсора в координаты canvas
     function updatePosition(clientX, clientY) {
-        const rect = torchArea.getBoundingClientRect();
+        const container = document.getElementById('figuresContainer');
+        const rect = container.getBoundingClientRect();
         mx = clientX - rect.left;
         my = clientY - rect.top;
     }
 
-    // Мышь
+    // Мышь (десктоп)
     window.addEventListener('mousemove', (e) => {
         updatePosition(e.clientX, e.clientY);
     });
 
-    // Касания (мобильные)
-    torchArea.addEventListener('touchstart', (e) => {
+    // ⚡ КАСАНИЯ — БЕЗ preventDefault для плавности
+    // touch-action: none в CSS уже блокирует скролл на canvas
+    dots.addEventListener('touchstart', (e) => {
         if (e.touches.length > 0) {
             updatePosition(e.touches[0].clientX, e.touches[0].clientY);
         }
     }, { passive: true });
 
-    torchArea.addEventListener('touchmove', (e) => {
+    dots.addEventListener('touchmove', (e) => {
         if (e.touches.length > 0) {
             updatePosition(e.touches[0].clientX, e.touches[0].clientY);
-            // Предотвращаем скролл страницы при вождении пальца по игровому полю
-            e.preventDefault();
+            // ❌ НЕ вызываем preventDefault — это даёт плавность
+            // Скролл блокируется через CSS touch-action: none
         }
-    }, { passive: false });
+    }, { passive: true });
 
-    // При ресайзе / повороте экрана — пересчитываем размеры
+    // Ресайз
     window.addEventListener('resize', setupCanvas);
     window.addEventListener('orientationchange', () => {
-        setTimeout(setupCanvas, 100);
+        setTimeout(setupCanvas, 150);
     });
 
-    // Старт
     setupCanvas();
     requestAnimationFrame(render);
 });

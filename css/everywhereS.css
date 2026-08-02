@@ -7,7 +7,8 @@
 
 html, body {
     height: 100vh;
-    height: 100dvh;
+    min-height: 100vh;
+    min-height: -webkit-fill-available; /* iOS Safari fallback */
     overflow: hidden;
     touch-action: pan-y;
     -webkit-overflow-scrolling: touch;
@@ -123,8 +124,10 @@ body {
 .figures {
     flex: 1;
     position: relative;
-    min-height: 0;
+    min-height: 300px; /*  Явная минимальная высота для мобильных */
     overflow: hidden;
+    /* ⚡ touch-action: none перенесён сюда — блокирует скролл на всей игровой области */
+    touch-action: none;
 }
 
 .figures__container {
@@ -142,14 +145,13 @@ body {
     align-content: center;
 }
 
+/* ⚡ Canvas: убран pointer-events: none и touch-action: none */
 #dots {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    pointer-events: none;
-    touch-action: none;
     z-index: 10;
 }
 
@@ -291,6 +293,10 @@ body {
     .refresh-btn svg {
         width: 18px;
         height: 18px;
+    }
+    
+    .figures {
+        min-height: 400px; /* ⚡ Больше места для игрового поля на мобильных */
     }
     
     .figures__container {

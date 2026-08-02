@@ -1,24 +1,39 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Массив всех доступных картинок: файл + русское название
     const allImages = [
-        { file: 'bus.png',       name: 'Автобус'  },
-        { file: 'pineapple.png', name: 'Ананас'   },
-        { file: 'cactus.png',    name: 'Кактус'   },
-        { file: 'cabbage.png',   name: 'Капуста'  },
-        { file: 'stroller.png',  name: 'Коляска'  },
-        { file: 'sumka.png',     name: 'Сумка'    },
-        { file: 'sok.png',       name: 'Сок'      },
-        { file: 'coconut.png',   name: 'Кокос'    },
-        { file: 'posuda.png',    name: 'Посуда'   },
-        { file: 'sunduk.png',    name: 'Сундук'   },
-        { file: 'maska.png',     name: 'Маска'    }
+        { file: 'airplane.png', name: 'Самолёт'  },
+        { file: 'aist.png',     name: 'Аист'     },
+        { file: 'bus.png',      name: 'Автобус'  },
+        { file: 'busi.png',     name: 'Бусы'     },
+        { file: 'chasi.png',    name: 'Часы'     },
+        { file: 'dog.png',      name: 'Собака'   },
+        { file: 'kaktus.png',   name: 'Кактус'   },
+        { file: 'kapusta.png',  name: 'Капуста'  },
+        { file: 'kassa.png',    name: 'Касса'    },
+        { file: 'kokos.png',    name: 'Кокос'    },
+        { file: 'koleso.png',   name: 'Колесо'   },
+        { file: 'kolyaska.png', name: 'Коляска'  },
+        { file: 'kosa.png',     name: 'Коса'     },
+        { file: 'maska.png',    name: 'Маска'    },
+        { file: 'noski.png',    name: 'Носки'    },
+        { file: 'posuda.png',   name: 'Посуда'   },
+        { file: 'pylesos.png',  name: 'Пылесос'  },
+        { file: 'sani.png',     name: 'Сани'     },
+        { file: 'sapogi.png',   name: 'Сапоги'   },
+        { file: 'sok.png',      name: 'Сок'      },
+        { file: 'soup.png',     name: 'Суп'      },
+        { file: 'sova.png',     name: 'Сова'     },
+        { file: 'sumka.png',    name: 'Сумка'    },
+        { file: 'sunduk.png',   name: 'Сундук'   }
     ];
 
-    const IMAGES_PER_GAME = 6; // сколько картинок показывать за раз
+    const IMAGES_PER_GAME = 6;
 
-    // Алгоритм Фишера-Йетса для случайного выбора N элементов
+    // Загрузка звука
+    const clickSound = new Audio('sounds/click.mp3');
+    clickSound.preload = 'auto';
+
     function getRandomItems(arr, count) {
-        const copy = arr.slice(); // копия, чтобы не менять оригинал
+        const copy = arr.slice();
         const result = [];
         for (let i = 0; i < count && copy.length > 0; i++) {
             const randomIndex = Math.floor(Math.random() * copy.length);
@@ -27,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return result;
     }
 
-    // Генерируем HTML для одной картинки
     function createFigureHTML(item, index) {
         return `
             <figure class="figures__figure">
@@ -40,15 +54,50 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
-    // Выбираем 6 случайных картинок и вставляем в контейнер
-    const container = document.getElementById('figuresContainer');
-    if (container) {
+    function generateFigures() {
+        const container = document.getElementById('figuresContainer');
+        if (!container) return;
+
         const selected = getRandomItems(allImages, IMAGES_PER_GAME);
         const html = selected.map(createFigureHTML).join('');
-        // Вставляем НОВОЕ содержимое, но сохраняем canvas
+        
         const canvas = document.getElementById('dots');
         container.innerHTML = '';
         container.appendChild(canvas);
         container.insertAdjacentHTML('beforeend', html);
+
+        if (typeof gsap !== 'undefined') {
+            gsap.from('.figures__figure', {
+                duration: 0.6,
+                scale: 0.8,
+                opacity: 0,
+                stagger: 0.15,
+                ease: 'back.out(1.7)'
+            });
+        }
+    }
+
+    generateFigures();
+
+    const refreshBtn = document.getElementById('refreshBtn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+            // Воспроизведение звука
+            clickSound.currentTime = 0; // Сброс к началу
+            clickSound.play().catch(e => console.log('Audio play failed:', e));
+
+            // Анимация кнопки
+            if (typeof gsap !== 'undefined') {
+                gsap.to(refreshBtn, {
+                    scale: 0.95,
+                    duration: 0.1,
+                    yoyo: true,
+                    repeat: 1
+                });
+            }
+
+            // Генерация новых картинок
+            generateFigures();
+        });
     }
 });

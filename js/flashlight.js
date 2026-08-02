@@ -3,18 +3,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!dots) return;
 
     const ctx = dots.getContext('2d');
+    const torchArea = document.getElementById('torch');
 
     let canvasWidth = 0;
     let canvasHeight = 0;
     let mx = 0;
     let my = 0;
-    
-    // Радиус фонарика (уменьшен на 50%)
-    const LIGHT_RADIUS = 65;
+    const LIGHT_RADIUS = 60; // ⚡ Радиус 60px
 
     function setupCanvas() {
-        const container = document.getElementById('figuresContainer');
-        const rect = container.getBoundingClientRect();
+        //  Размеры canvas берём от torchArea (родителя), чтобы canvas покрывал всю область
+        const rect = torchArea.getBoundingClientRect();
         const dpr = window.devicePixelRatio || 1;
 
         canvasWidth = rect.width;
@@ -55,37 +54,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updatePosition(clientX, clientY) {
-        const container = document.getElementById('figuresContainer');
-        const rect = container.getBoundingClientRect();
+        // ⚡ ВАЖНО: координаты считаем относительно самого canvas, а не torchArea
+        // Это исправляет баг с отступом ~10 см на широких экранах
+        const rect = dots.getBoundingClientRect();
         mx = clientX - rect.left;
         my = clientY - rect.top;
     }
 
-    // Мышь (десктоп)
+    // ===== DESKTOP: МЫШЬ =====
     window.addEventListener('mousemove', (e) => {
         updatePosition(e.clientX, e.clientY);
     });
 
-    // ⚡ КАСАНИЯ — БЕЗ preventDefault для плавности
-    // touch-action: none в CSS уже блокирует скролл на canvas
-    dots.addEventListener('touchstart', (e) => {
+    // ===== MOBILE: КАСАНИЯ (ваш подход — события на torchArea) =====
+    torchArea.addEventListener('touchstart', (e) => {
         if (e.touches.length > 0) {
             updatePosition(e.touches[0].clientX, e.touches[0].clientY);
         }
     }, { passive: true });
 
-    dots.addEventListener('touchmove', (e) => {
+    torchArea.addEventListener('touchmove', (e) => {
         if (e.touches.length > 0) {
             updatePosition(e.touches[0].clientX, e.touches[0].clientY);
-            // ❌ НЕ вызываем preventDefault — это даёт плавность
-            // Скролл блокируется через CSS touch-action: none
+            e.preventDefault();
         }
-    }, { passive: true });
+    }, { passive: false });
 
-    // Ресайз
+    // ===== RESIZE =====
     window.addEventListener('resize', setupCanvas);
     window.addEventListener('orientationchange', () => {
-        setTimeout(setupCanvas, 150);
+        setTimeout(setupCanvas, 100);
     });
 
     setupCanvas();

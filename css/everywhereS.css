@@ -7,7 +7,7 @@
 
 html, body {
     height: 100vh;
-    height: 100dvh; /* для мобильных браузеров */
+    height: 100dvh;
     overflow: hidden;
     touch-action: pan-y;
     -webkit-overflow-scrolling: touch;
@@ -30,16 +30,22 @@ body {
 
 /* ===== HEADER ===== */
 .header {
-    padding: 15px 0;
+    padding: 20px 0 15px;
     text-align: center;
     background-color: #16213e;
     flex-shrink: 0;
 }
 
 .header__title {
-    font-size: 1.8rem;
-    margin-bottom: 10px;
+    font-size: 2rem;
+    margin-bottom: 15px;
     color: #ffd369;
+}
+
+.header__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .instruction {
@@ -48,13 +54,13 @@ body {
     align-items: center;
     justify-content: center;
     gap: 25px;
-    max-width: 900px;
+    max-width: 1000px;
     margin: 0 auto;
     text-align: left;
 }
 
 .instruction__img {
-    max-width: 300px;
+    max-width: 200px;
     width: 100%;
     height: auto;
     flex-shrink: 0;
@@ -62,9 +68,47 @@ body {
 
 .instruction__text {
     font-size: 1rem;
-    line-height: 1.5;
+    line-height: 1.6;
     color: #e0e0e0;
     flex: 1;
+    max-width: 600px;
+}
+
+/* ===== КНОПКА "ЕЩЁ РАЗ" В ХЕДЕРЕ ===== */
+.refresh-wrap {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.refresh-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 25px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 3px 12px rgba(102, 126, 234, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+    touch-action: manipulation;
+}
+
+.refresh-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.6);
+}
+
+.refresh-btn:active {
+    transform: translateY(0);
+}
+
+.refresh-btn svg {
+    width: 20px;
+    height: 20px;
 }
 
 /* ===== MAIN ===== */
@@ -73,7 +117,7 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    min-height: 0; /* важно для flex-контейнера */
+    min-height: 0;
 }
 
 .figures {
@@ -88,9 +132,9 @@ body {
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 30px;
+    gap: 40px;
     position: relative;
-    padding: 20px;
+    padding: 30px;
     height: 100%;
     width: 100%;
     max-width: 1200px;
@@ -98,7 +142,6 @@ body {
     align-content: center;
 }
 
-/* Canvas */
 #dots {
     position: absolute;
     top: 0;
@@ -106,7 +149,7 @@ body {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    touch-action: none; /* ключевое для плавности */
+    touch-action: none;
     z-index: 10;
 }
 
@@ -118,56 +161,18 @@ body {
 }
 
 .figures__img {
-    max-width: 130px;
+    max-width: 180px;
     height: auto;
     display: block;
-    margin: 0 auto 8px;
+    margin: 0 auto 10px;
     filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
 }
 
 .figures__par {
-    font-size: 1rem;
+    font-size: 1.2rem;
     font-weight: bold;
     color: #fff;
     text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-}
-
-/* ===== КНОПКА ===== */
-.refresh-wrap {
-    text-align: center;
-    padding: 15px 0 20px;
-    flex-shrink: 0;
-}
-
-.refresh-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 30px;
-    font-size: 1rem;
-    font-weight: bold;
-    color: #fff;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    transition: transform 0.2s, box-shadow 0.2s;
-    touch-action: manipulation;
-}
-
-.refresh-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-}
-
-.refresh-btn:active {
-    transform: translateY(0);
-}
-
-.refresh-btn svg {
-    width: 22px;
-    height: 22px;
 }
 
 /* ===== ОВЕРЛЕЙ ПОВОРОТА ===== */
@@ -208,60 +213,96 @@ body {
 
 /* ===== ДЕСКТОП ===== */
 @media (min-width: 769px) {
+    .header {
+        padding: 25px 0 20px;
+    }
+    
+    .header__title {
+        font-size: 2.2rem;
+    }
+    
     .instruction__img {
-        max-width: 450px;
+        max-width: 220px;
     }
     
     .instruction__text {
         font-size: 1.1rem;
     }
     
+    .refresh-btn {
+        padding: 12px 30px;
+        font-size: 1rem;
+    }
+    
+    .refresh-btn svg {
+        width: 22px;
+        height: 22px;
+    }
+    
+    .figures__container {
+        gap: 50px;
+        padding: 40px;
+    }
+    
     .figures__img {
-        max-width: 140px;
+        max-width: 200px;
+    }
+    
+    .figures__par {
+        font-size: 1.3rem;
     }
 }
 
 /* ===== МОБИЛЬНАЯ ВЕРТИКАЛЬНАЯ ===== */
 @media (max-width: 768px) and (orientation: portrait) {
     .header {
-        padding: 10px 0;
+        padding: 12px 0 10px;
     }
     
     .header__title {
-        font-size: 1.3rem;
-        margin-bottom: 8px;
+        font-size: 1.4rem;
+        margin-bottom: 10px;
     }
     
     .instruction {
         flex-direction: column;
         text-align: center;
-        gap: 10px;
+        gap: 12px;
     }
     
     .instruction__img {
-        max-width: 120px;
+        max-width: 130px;
     }
     
     .instruction__text {
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         line-height: 1.4;
     }
     
-    .figures__container {
-        gap: 15px;
-        padding: 15px 10px;
-    }
-    
-    .figures__img {
-        max-width: 90px;
-    }
-    
-    .figures__par {
-        font-size: 0.85rem;
+    .refresh-wrap {
+        margin-top: 12px;
     }
     
     .refresh-btn {
-        padding: 10px 25px;
+        padding: 8px 20px;
+        font-size: 0.9rem;
+    }
+    
+    .refresh-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .figures__container {
+        gap: 20px;
+        padding: 20px 15px;
+    }
+    
+    .figures__img {
+        max-width: 100px;
+    }
+    
+    .figures__par {
         font-size: 0.95rem;
     }
 }

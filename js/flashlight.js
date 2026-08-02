@@ -1,108 +1,110 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const allImages = [
-        { file: 'airplane.png', name: 'Самолёт'  },
-        { file: 'aist.png',     name: 'Аист'     },
-        { file: 'bus.png',      name: 'Автобус'  },
-        { file: 'busi.png',     name: 'Бусы'     },
-        { file: 'chasi.png',    name: 'Часы'     },
-        { file: 'dog.png',      name: 'Собака'   },
-        { file: 'kaktus.png',   name: 'Кактус'   },
-        { file: 'kapusta.png',  name: 'Капуста'  },
-        { file: 'kassa.png',    name: 'Касса'    },
-        { file: 'kokos.png',    name: 'Кокос'    },
-        { file: 'koleso.png',   name: 'Колесо'   },
-        { file: 'kolyaska.png', name: 'Коляска'  },
-        { file: 'kosa.png',     name: 'Коса'     },
-        { file: 'maska.png',    name: 'Маска'    },
-        { file: 'noski.png',    name: 'Носки'    },
-        { file: 'posuda.png',   name: 'Посуда'   },
-        { file: 'pylesos.png',  name: 'Пылесос'  },
-        { file: 'sani.png',     name: 'Сани'     },
-        { file: 'sapogi.png',   name: 'Сапоги'   },
-        { file: 'sok.png',      name: 'Сок'      },
-        { file: 'soup.png',     name: 'Суп'      },
-        { file: 'sova.png',     name: 'Сова'     },
-        { file: 'sumka.png',    name: 'Сумка'    },
-        { file: 'sunduk.png',   name: 'Сундук'   }
-    ];
+    const dots = document.getElementById('dots');
+    if (!dots) return;
 
-    const IMAGES_PER_GAME = 6;
+    const ctx = dots.getContext('2d');
+    const torchArea = document.getElementById('torch');
 
-    // Звук кнопки "Ещё раз"
-    const clickSound = new Audio('sounds/click.mp3');
-    clickSound.preload = 'auto';
-    clickSound.volume = 0.7;
-    clickSound.setAttribute('playsinline', '');
-    clickSound.setAttribute('webkit-playsinline', '');
+    let canvasWidth = 0;
+    let canvasHeight = 0;
+    let mx = 0;
+    let my = 0;
+    const LIGHT_RADIUS = 60;
 
-    function getRandomItems(arr, count) {
-        const copy = arr.slice();
-        const result = [];
-        for (let i = 0; i < count && copy.length > 0; i++) {
-            const randomIndex = Math.floor(Math.random() * copy.length);
-            result.push(copy.splice(randomIndex, 1)[0]);
+    function setupCanvas() {
+        // ⚡ Используем размеры torchArea (родителя), чтобы canvas покрывал всю область
+        const rect = torchArea.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+
+        canvasWidth = rect.width;
+        canvasHeight = rect.height;
+
+        //  Защита от нулевых размеров (бывает на мобильных при быстром рендере)
+        if (canvasWidth === 0 || canvasHeight === 0) {
+            setTimeout(setupCanvas, 100);
+            return;
         }
-        return result;
+
+        dots.width = canvasWidth * dpr;
+        dots.height = canvasHeight * dpr;
+        dots.style.width = canvasWidth + 'px';
+        dots.style.height = canvasHeight + 'px';
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(dpr, dpr);
+
+        mx = canvasWidth / 2;
+        my = canvasHeight / 2;
     }
 
-    function createFigureHTML(item, index) {
-        return `
-            <figure class="figures__figure">
-                <img id="character${index + 1}" 
-                     src="img/figur/${item.file}" 
-                     class="figures__img" 
-                     alt="${item.name}">
-                <figcaption class="figures__par">${item.name}</figcaption>
-            </figure>
-        `;
+    function render() {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.fillStyle = 'rgba(10, 10, 25, 0.97)';
+        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+        ctx.globalCompositeOperation = 'destination-out';
+
+        const gradient = ctx.createRadialGradient(mx, my, 0, mx, my, LIGHT_RADIUS);
+        gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
+        gradient.addColorStop(0.6, 'rgba(0, 0, 0, 0.9)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(mx, my, LIGHT_RADIUS, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.globalCompositeOperation = 'source-over';
+
+        requestAnimationFrame(render);
     }
 
-    function generateFigures() {
-        const container = document.getElementById('figuresContainer');
-        if (!container) return;
+    function updatePosition(clientX, clientY) {
+        // ⚡ Координаты считаем относительно самого canvas
+        const rect = dots.getBoundingClientRect();
+        mx = clientX - rect.left;
+        my = clientY - rect.top;
+    }
 
-        const selected = getRandomItems(allImages, IMAGES_PER_GAME);
-        const html = selected.map(createFigureHTML).join('');
-        
-        const canvas = document.getElementById('dots');
-        container.innerHTML = '';
-        container.appendChild(canvas);
-        container.insertAdjacentHTML('beforeend', html);
+    // ===== DESKTOP: МЫШЬ =====
+    window.addEventListener('mousemove', (e) => {
+        updatePosition(e.clientX, e.clientY);
+    });
 
-        if (typeof gsap !== 'undefined') {
-            gsap.from('.figures__figure', {
-                duration: 0.6,
-                scale: 0.8,
-                opacity: 0,
-                stagger: 0.15,
-                ease: 'back.out(1.7)'
-            });
+    // ===== MOBILE: КАСАНИЯ =====
+    //  События висят на torchArea (родителе canvas), а не на самом canvas
+    // Это работает, потому что touch-action: none теперь на .figures в CSS
+    
+    torchArea.addEventListener('touchstart', (e) => {
+        if (e.touches.length > 0) {
+            updatePosition(e.touches[0].clientX, e.touches[0].clientY);
         }
-    }
+    }, { passive: true });
 
-    generateFigures();
+    torchArea.addEventListener('touchmove', (e) => {
+        if (e.touches.length > 0) {
+            updatePosition(e.touches[0].clientX, e.touches[0].clientY);
+            e.preventDefault();
+        }
+    }, { passive: false });
 
-    const refreshBtn = document.getElementById('refreshBtn');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', () => {
-            // Воспроизведение звука кнопки
-            clickSound.currentTime = 0;
-            const playPromise = clickSound.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(err => console.debug('Click sound failed:', err));
-            }
+    torchArea.addEventListener('touchend', () => {
+        // Можно добавить логику при окончании касания
+    }, { passive: true });
 
-            // Анимация кнопки
-            if (typeof gsap !== 'undefined') {
-                gsap.to(refreshBtn, {
-                    scale: 0.95,
-                    duration: 0.1,
-                    yoyo: true,
-                    repeat: 1
-                });
-            }
+    torchArea.addEventListener('touchcancel', () => {
+        // Обработка отмены касания (например, при входящем звонке)
+    }, { passive: true });
 
-            generateFigures();
-        });
-    }
+    // ===== RESIZE =====
+    window.addEventListener('resize', setupCanvas);
+    window.addEventListener('orientationchange', () => {
+        setTimeout(setupCanvas, 200); // ⚡ Увеличена задержка для мобильных
+    });
+
+    // ⚡ Задержка перед первым запуском для гарантии рендера на мобильных
+    setTimeout(() => {
+        setupCanvas();
+        requestAnimationFrame(render);
+    }, 100);
 });
